@@ -106,13 +106,3 @@ def one_hot_encode(labels):
 			res.append(1)
 
 	return res
-
-
-
-
-
-
-
-
-
-
