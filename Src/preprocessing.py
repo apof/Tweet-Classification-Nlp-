@@ -9,6 +9,7 @@ from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 
+
 def convert_lex_to_dict():
 
 	lex_names = ['../lexica/affin/affin.txt','../lexica/emotweet/valence_tweet.txt','../lexica/generic/generic.txt','../lexica/nrc/val.txt','../lexica/nrctag/val.txt']
@@ -37,31 +38,68 @@ def create_sentiment_vectors(tweets,dicts):
 	for t in tweets:
 		tweet_array = np.zeros(len(dicts))
 		for i in range(0,len(dicts)):
+			count = 0
 			for word in t:
 				value = dicts[i].get("word")
 				if(value!=None):
+					count += 1
 					tweet_array[i] += value
+			#compute the mean valance
+			if(count!=0):
+				tweet_array[i] = tweet_array[i]/float(count)
 		vectors.append(tweet_array)
 
 	return np.array(vectors)
 
-#tokenization - stemming and stopwords removal
+#exclude non alphabetic words, tokenization, stemming and stopwords removal
 def process_tweets(tweets):
 
 	stop_words = set(stopwords.words('english')) 
 
+	count = 0
+
 	list_of_tokenized_tweets = []
 	for t in tweets:
+		#tokenize
 		tknzr = TweetTokenizer()
 		tokenized_tweet = tknzr.tokenize(t)
-		filtered_sentence = [w for w in tokenized_tweet if not w in stop_words]
+		# convert to lower case
+		tokenized_tweet = [w.lower() for w in tokenized_tweet]
+		# exclude non alphabetic words
+		only_alpha_sentence = [word for word in tokenized_tweet if word.isalpha()]
+		# remove stopwords
+		filtered_sentence = [w for w in only_alpha_sentence if not w in stop_words]
 		tweet_list = []
+		# stemming
 		ps = PorterStemmer()
 		for word in filtered_sentence:
 			tweet_list.append(ps.stem(word))
+		count += 1
+		if(count<20):
+			print(str(count) + ' ' + str(tweet_list))
 		list_of_tokenized_tweets.append(tweet_list)
 
 	return list_of_tokenized_tweets
+
+def exclude_words(tweets):
+
+	res = []
+
+	count = 0
+	for t in tweets:
+
+		count += 1
+		t_cleaned = ' '.join(item for item in t.split() if not (item.startswith('http')))
+		t_cleaned = ' '.join(item for item in t_cleaned.split() if not (item.startswith('@')))
+		t_cleaned = ' '.join(item for item in t_cleaned.split() if not (item.startswith('#')))
+
+		res.append(t_cleaned)
+
+		if (count<20):
+			print(str(count) + ' ' + t)
+			print(t_cleaned)
+
+	return res
 
 def tfidf_vectorization(tweets):
 
@@ -76,7 +114,7 @@ def tfidf_vectorization(tweets):
 	return vectorizer.fit_transform(corpus)
 
 def dim_reduction(vectors):
-	svd = TruncatedSVD(n_components=1000, n_iter=7, random_state=42)
+	svd = TruncatedSVD(n_components=500, n_iter=10)
 	return svd.fit_transform(vectors)
 
 def concatenate_vectors(vectors,sentiments):
