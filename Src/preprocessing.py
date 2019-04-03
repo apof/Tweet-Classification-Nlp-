@@ -4,6 +4,7 @@ from sklearn.decomposition import TruncatedSVD
 import math
 from nltk.tokenize import TweetTokenizer
 from nltk.stem import PorterStemmer
+from nltk.stem import  WordNetLemmatizer
 import nltk
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -71,9 +72,11 @@ def process_tweets(tweets):
 		filtered_sentence = [w for w in only_alpha_sentence if not w in stop_words]
 		tweet_list = []
 		# stemming
-		ps = PorterStemmer()
+		# ps = PorterStemmer()
+		lemmatizer = WordNetLemmatizer()
 		for word in filtered_sentence:
-			tweet_list.append(ps.stem(word))
+			#tweet_list.append(ps.stem(word))
+			tweet_list.append(lemmatizer.lemmatize(word))
 		count += 1
 		if(count<20):
 			print(str(count) + ' ' + str(tweet_list))
@@ -84,21 +87,16 @@ def process_tweets(tweets):
 def exclude_words(tweets):
 
 	res = []
-
 	count = 0
 	for t in tweets:
-
 		count += 1
 		t_cleaned = ' '.join(item for item in t.split() if not (item.startswith('http')))
 		t_cleaned = ' '.join(item for item in t_cleaned.split() if not (item.startswith('@')))
 		t_cleaned = ' '.join(item for item in t_cleaned.split() if not (item.startswith('#')))
-
 		res.append(t_cleaned)
-
 		if (count<20):
 			print(str(count) + ' ' + t)
 			print(t_cleaned)
-
 	return res
 
 def tfidf_vectorization(tweets):
@@ -142,5 +140,4 @@ def one_hot_encode(labels):
 			res.append(2)
 		else:
 			res.append(1)
-
 	return res
