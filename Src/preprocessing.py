@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.decomposition import TruncatedSVD
 import math
 from nltk.tokenize import TweetTokenizer
+from nltk.tokenize import RegexpTokenizer
 from nltk.stem import PorterStemmer
 from nltk.stem import  WordNetLemmatizer
 import nltk
@@ -62,7 +63,8 @@ def process_tweets(tweets):
 	list_of_tokenized_tweets = []
 	for t in tweets:
 		#tokenize
-		tknzr = TweetTokenizer()
+		#tknzr = TweetTokenizer()
+		tknzr = RegexpTokenizer(r'\w+')
 		tokenized_tweet = tknzr.tokenize(t)
 		# convert to lower case
 		tokenized_tweet = [w.lower() for w in tokenized_tweet]
@@ -112,7 +114,7 @@ def tfidf_vectorization(tweets):
 	return vectorizer.fit_transform(corpus)
 
 def dim_reduction(vectors):
-	svd = TruncatedSVD(n_components=500, n_iter=10)
+	svd = TruncatedSVD(n_components=30, n_iter=10)
 	return svd.fit_transform(vectors)
 
 def concatenate_vectors(vectors,sentiments):

@@ -14,6 +14,8 @@ encoded_labels = preprocessing.one_hot_encode(labels)
 
 utils.dataset_balance(encoded_labels)
 
+tweets = preprocessing.exclude_words(tweets)
+
 list_of_processed_tweets = preprocessing.process_tweets(tweets)
 
 sentiment_vectors = preprocessing.create_sentiment_vectors(list_of_processed_tweets,sentiment_dicts)
