@@ -11,6 +11,8 @@ from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import CountVectorizer
 
+
+# create a list of dictionaries, containing one dictionary for each available lexicon
 def convert_lex_to_dict():
 
 	lex_names = ['../lexica/affin/affin.txt','../lexica/emotweet/valence_tweet.txt','../lexica/generic/generic.txt','../lexica/nrc/val.txt','../lexica/nrctag/val.txt']
@@ -32,6 +34,12 @@ def convert_lex_to_dict():
 
 	return list_of_dicts
 
+# creating a vector capturing tweets's sentiment behaviour
+# the vector contains:
+## the mean valance of tweet using each one of the available lexicons (5 slots equal to lexs number)
+## the total valance using all the lexs of the first and the second half of the tweet
+## the min and max valance of any word in the tweet using all the lexs
+## tweet's number of words
 def create_sentiment_vectors(tweets,dicts):
 
 	vectors = []
@@ -39,6 +47,7 @@ def create_sentiment_vectors(tweets,dicts):
 	for t in tweets:
 		tweet_array = np.zeros(len(dicts))
 		extra_tweet_array = np.zeros(5)
+		extra_tweet_array[4] = len(t)
 		minv = 1000
 		maxv = -1000
 		median_index = len(t)/2
@@ -58,7 +67,6 @@ def create_sentiment_vectors(tweets,dicts):
 					if(value > maxv):
 						extra_tweet_array[1] = value
 						maxv = value
-					extra_tweet_array[4] = len(t)
 					tweet_array[i] += value
 			#compute the mean valance
 			if(count!=0):
@@ -101,6 +109,7 @@ def process_tweets(tweets):
 
 	return list_of_tokenized_tweets
 
+# exclude links and @,# type hashtags
 def exclude_words(tweets):
 
 	res = []
@@ -116,6 +125,7 @@ def exclude_words(tweets):
 			print(t_cleaned)
 	return res
 
+# count or tfidf vectorization
 def tfidf_vectorization(tweets):
 
 	corpus = []
@@ -129,10 +139,12 @@ def tfidf_vectorization(tweets):
 	#vectorizer = CountVectorizer()
 	return vectorizer.fit_transform(corpus)
 
+# dim reduction using trucated svd
 def dim_reduction(vectors):
-	svd = TruncatedSVD(n_components=80, n_iter=10)
+	svd = TruncatedSVD(n_components=400, n_iter=10)
 	return svd.fit_transform(vectors)
 
+# concatanate tweet and sentiment vectors
 def concatenate_vectors(vectors,sentiments):
 
 	result_vecs = []
@@ -147,6 +159,7 @@ def concatenate_vectors(vectors,sentiments):
 
 	return np.array(result_vecs)
 
+# convert labels to nums
 def one_hot_encode(labels):
 
 	res = []

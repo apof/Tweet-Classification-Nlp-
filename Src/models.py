@@ -23,7 +23,11 @@ vectorized_tweets = preprocessing.tfidf_vectorization(list_of_processed_tweets)
 dim_reduced_tweets = preprocessing.dim_reduction(vectorized_tweets)
 final_vectors = preprocessing.concatenate_vectors(dim_reduced_tweets,sentiment_vectors)
 
-final_vectors,encoded_labels =  utils.dataset_balance(encoded_labels,final_vectors)
+# my data resampling function
+#final_vectors,encoded_labels =  utils.dataset_balance(encoded_labels,final_vectors)
+
+#use of built in resampling methods
+final_vectors,encoded_labels = utils.dataset_sampling(final_vectors,encoded_labels)
 
 #clf = KNeighborsClassifier(n_neighbors=11,metric = 'cosine')
 #clf = SVC(gamma='auto',kernel='poly')

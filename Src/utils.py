@@ -6,8 +6,8 @@ from sklearn.model_selection import KFold
 from sklearn.metrics import f1_score, accuracy_score, recall_score, precision_score, confusion_matrix
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
-
-
+from imblearn.over_sampling import SMOTE
+from imblearn.over_sampling import RandomOverSampler
 
 def load_dataset(dir_name):
     df = pd.read_csv(dir_name, sep="\t")
@@ -64,6 +64,8 @@ def unison_shuffled_copies(a, b):
     p = np.random.permutation(len(a))
     return a[p], b[p]
 
+
+# balance the dataset making over-samlping (replication) and subsampling
 def dataset_balance(labels,tweets):
 
 	positive_list = []
@@ -123,7 +125,12 @@ def dataset_balance(labels,tweets):
 	return unison_shuffled_copies(vectors,labels)
 
 
-
+def dataset_sampling(X,y):
+	sm = SMOTE(random_state=42)
+	#ros = RandomOverSampler(random_state=0)
+	X_res, y_res = sm.fit_resample(X, y)
+	#X_res, y_res = ros.fit_resample(X, y)
+	return X_res,y_res
 
 
 
