@@ -26,7 +26,7 @@ final_vectors = preprocessing.concatenate_vectors(dim_reduced_tweets,sentiment_v
 # my data resampling function
 #final_vectors,encoded_labels =  utils.dataset_balance(encoded_labels,final_vectors)
 
-#use of built in resampling methods
+#use of built in resampling methods random-oversampling and SMOTE
 final_vectors,encoded_labels = utils.dataset_sampling(final_vectors,encoded_labels)
 
 #clf = KNeighborsClassifier(n_neighbors=11,metric = 'cosine')

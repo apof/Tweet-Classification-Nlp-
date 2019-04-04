@@ -8,6 +8,11 @@ from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from imblearn.over_sampling import SMOTE
 from imblearn.over_sampling import RandomOverSampler
+from imblearn.under_sampling import RandomUnderSampler
+from imblearn.under_sampling import TomekLinks
+from imblearn.combine import SMOTETomek
+from imblearn.under_sampling import ClusterCentroids
+
 
 def load_dataset(dir_name):
     df = pd.read_csv(dir_name, sep="\t")
@@ -126,16 +131,16 @@ def dataset_balance(labels,tweets):
 
 
 def dataset_sampling(X,y):
-	sm = SMOTE(random_state=42)
-	#ros = RandomOverSampler(random_state=0)
-	X_res, y_res = sm.fit_resample(X, y)
+	sm = SMOTE(random_state=42,ratio='minority')
+	smt = SMOTETomek(ratio='auto')
+	ros = RandomOverSampler(random_state=0)
+	rus = RandomUnderSampler(random_state=0)
+	tl = TomekLinks(return_indices=True, ratio='majority')
+	cc = ClusterCentroids(ratio={0: 10})
+	#X_res, y_res = sm.fit_resample(X, y)
 	#X_res, y_res = ros.fit_resample(X, y)
+	#X_res, y_res = rus.fit_resample(X, y)
+	X_res, y_res, id_tl = tl.fit_sample(X, y)
+	#X_res, y_res = cc.fit_sample(X, y)
+	#X_res, y_res = smt.fit_sample(X, y)
 	return X_res,y_res
-
-
-
-
-
-
-
-
