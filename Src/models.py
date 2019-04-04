@@ -1,9 +1,11 @@
 import preprocessing
 import utils
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import SVC
 import numpy as np
 from sklearn.linear_model import SGDClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neural_network import MLPClassifier
 
 
 sentiment_dicts =  preprocessing.convert_lex_to_dict()
@@ -23,12 +25,14 @@ final_vectors = preprocessing.concatenate_vectors(dim_reduced_tweets,sentiment_v
 
 final_vectors,encoded_labels =  utils.dataset_balance(encoded_labels,final_vectors)
 
-train_data,train_labels,test_data,test_labels = utils.split_into_train_test(final_vectors,encoded_labels)
-clf = KNeighborsClassifier(n_neighbors=11,metric = 'cosine')
+#clf = KNeighborsClassifier(n_neighbors=11,metric = 'cosine')
 #clf = SVC(gamma='auto',kernel='poly')
-clf.fit(train_data,train_labels)
-preds = clf.predict(test_data)
-utils.calculate_metrics(test_labels,preds)
-
-#print("10FoldCross Validation...")
-#utils.KfoldCrossValidation(clf,np.array(final_vectors),np.array(encoded_labels),10)
+#clf = SGDClassifier(max_iter=1000, tol=1e-3)
+#clf = RandomForestClassifier(n_estimators=10, max_depth=None,min_samples_split=2, random_state=0)
+clf = MLPClassifier(solver='lbfgs', alpha=1e-5,random_state=1)
+#train_data,train_labels,test_data,test_labels = utils.split_into_train_test(final_vectors,encoded_labels)
+#clf.fit(train_data,train_labels)
+#preds = clf.predict(test_data)
+#utils.calculate_metrics(test_labels,preds)
+print("10FoldCross Validation...")
+utils.KfoldCrossValidation(clf,np.array(final_vectors),np.array(encoded_labels),10)

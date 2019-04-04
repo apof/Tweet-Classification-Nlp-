@@ -30,7 +30,7 @@ def KfoldCrossValidation(clf,inputs, labels, folds):
 	recall = 0
 	f1 = 0
 
-	count = 1
+	count = 0
 	
 	for train_index, test_index in kf.split(inputs):
 		X_train, X_test = inputs[train_index], inputs[test_index]
@@ -40,18 +40,19 @@ def KfoldCrossValidation(clf,inputs, labels, folds):
 		preds = clf.predict(X_test)
 		print("-->Fold: " + str(count) + " in progress..")
 
-		accuracy += accuracy_score(y_test, preds)
-		precision += precision_score(y_test, preds,average='micro')
-		recall += recall_score(y_test, preds,average='micro')
-		f1 += f1_score(y_test, preds,average='micro')
+		#accuracy += accuracy_score(y_test, preds)
+		#precision += precision_score(y_test, preds,average='micro')
+		#recall += recall_score(y_test, preds,average='micro')
+		current_f1 = f1_score(y_test, preds,average='micro')
+		f1 += current_f1
 
 		count += 1
 
-	print("Total Metrics after all folds are: ")
-	print("Accuracy = " + str(accuracy/folds))
-	print("Recall = " + str(recall/folds))
-	print("Precision = "  + str(precision/folds))
-	print("F1 = " + str(f1/folds))
+		#print("Accuracy = " + str(accuracy/count))
+		#print("Recall = " + str(recall/count))
+		#print("Precision = "  + str(precision/count))
+		print("total F1 = " + str(f1/count))
+		print("current F1 = " + str(current_f1))
 
 def calculate_metrics(y_pred,y_true):
 	target_names = ['Negative', 'Neutral', 'Positive']
