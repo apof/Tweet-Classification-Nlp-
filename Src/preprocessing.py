@@ -9,8 +9,7 @@ from nltk.stem import  WordNetLemmatizer
 import nltk
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
-
-
+from sklearn.feature_extraction.text import CountVectorizer
 
 def convert_lex_to_dict():
 
@@ -39,17 +38,33 @@ def create_sentiment_vectors(tweets,dicts):
 
 	for t in tweets:
 		tweet_array = np.zeros(len(dicts))
+		extra_tweet_array = np.zeros(5)
+		minv = 1000
+		maxv = -1000
+		median_index = len(t)/2
 		for i in range(0,len(dicts)):
 			count = 0
 			for word in t:
-				value = dicts[i].get("word")
+				value = dicts[i].get(word)
 				if(value!=None):
 					count += 1
+					if(count < median_index):
+						extra_tweet_array[2] += value
+					elif(count >= median_index):
+						extra_tweet_array[3] += value
+					if(value < minv):
+						extra_tweet_array[0] = value
+						minv = value
+					if(value > maxv):
+						extra_tweet_array[1] = value
+						maxv = value
+					extra_tweet_array[4] = len(t)
 					tweet_array[i] += value
 			#compute the mean valance
 			if(count!=0):
 				tweet_array[i] = tweet_array[i]/float(count)
-		vectors.append(tweet_array)
+
+		vectors.append(np.concatenate((tweet_array,extra_tweet_array),axis=0))
 
 	return np.array(vectors)
 
@@ -62,19 +77,19 @@ def process_tweets(tweets):
 
 	list_of_tokenized_tweets = []
 	for t in tweets:
-		#tokenize
+		##tokenize
 		#tknzr = TweetTokenizer()
 		tknzr = RegexpTokenizer(r'\w+')
 		tokenized_tweet = tknzr.tokenize(t)
-		# convert to lower case
+		##convert to lower case
 		tokenized_tweet = [w.lower() for w in tokenized_tweet]
-		# exclude non alphabetic words
+		##exclude non alphabetic words
 		only_alpha_sentence = [word for word in tokenized_tweet if word.isalpha()]
-		# remove stopwords
+		##remove stopwords
 		filtered_sentence = [w for w in only_alpha_sentence if not w in stop_words]
 		tweet_list = []
-		# stemming
-		# ps = PorterStemmer()
+		##stemming or lemmatization
+		#ps = PorterStemmer()
 		lemmatizer = WordNetLemmatizer()
 		for word in filtered_sentence:
 			#tweet_list.append(ps.stem(word))
@@ -111,10 +126,11 @@ def tfidf_vectorization(tweets):
 		corpus.append(string_tweet)
 
 	vectorizer = TfidfVectorizer()
+	#vectorizer = CountVectorizer()
 	return vectorizer.fit_transform(corpus)
 
 def dim_reduction(vectors):
-	svd = TruncatedSVD(n_components=30, n_iter=10)
+	svd = TruncatedSVD(n_components=80, n_iter=10)
 	return svd.fit_transform(vectors)
 
 def concatenate_vectors(vectors,sentiments):
