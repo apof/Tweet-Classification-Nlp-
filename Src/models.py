@@ -22,10 +22,15 @@ list_of_processed_tweets = preprocessing.process_tweets(tweets)
 
 sentiment_vectors = preprocessing.create_sentiment_vectors(list_of_processed_tweets,sentiment_dicts)
 vectorized_tweets = preprocessing.tfidf_vectorization(list_of_processed_tweets)
-dim_reduced_tweets = preprocessing.dim_reduction(vectorized_tweets)
+
+ngram_vectors = preprocessing.top_ngrams_vectorization(list_of_processed_tweets)
+
+dim_reduced_tweets = preprocessing.dim_reduction(vectorized_tweets,400)
+dim_reduced_ngram_vectors = preprocessing.dim_reduction(ngram_vectors,50)
 
 #dim_reduced_tweets = preprocessing.embedding_vectorization(list_of_processed_tweets,w2v_model)
-final_vectors = preprocessing.concatenate_vectors(dim_reduced_tweets,sentiment_vectors)
+final_vectors = preprocessing.concatenate_vectors(dim_reduced_tweets,dim_reduced_ngram_vectors)
+final_vectors = preprocessing.concatenate_vectors(final_vectors,sentiment_vectors)
 
 # my data resampling function
 #final_vectors,encoded_labels =  utils.dataset_balance(encoded_labels,final_vectors)

@@ -12,6 +12,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import CountVectorizer
 from gensim.models import Word2Vec
 from gensim.test.utils import get_tmpfile
+from nltk import ngrams
 
 # create a list of dictionaries, containing one dictionary for each available lexicon
 def convert_lex_to_dict():
@@ -141,8 +142,8 @@ def tfidf_vectorization(tweets):
 	return vectorizer.fit_transform(corpus)
 
 # dim reduction using trucated svd
-def dim_reduction(vectors):
-	svd = TruncatedSVD(n_components=400, n_iter=10)
+def dim_reduction(vectors,dim):
+	svd = TruncatedSVD(n_components=dim, n_iter=10)
 	return svd.fit_transform(vectors)
 
 # concatanate tweet and sentiment vectors
@@ -200,4 +201,60 @@ def embedding_vectorization(tweets,model):
 		vectorized_tweets.append(tweet_embedding)
 
 	return vectorized_tweets
+
+def top_ngrams_vectorization(tweets):
+
+	ngram_dict = {}
+	ngrams_list = []
+
+	for t in tweets:
+		string_tweet = ' '
+		for w in t:
+			string_tweet = string_tweet + w + ' '
+		twograms = ngrams(string_tweet.split(),2)
+		l = []
+		for element in twograms:
+			l.append(element)
+		ngrams_list.append(l)
+		for element in l:
+			value = ngram_dict.get(element)
+			if(value!=None):
+				ngram_dict[element] += 1
+			else:
+				ngram_dict[element] = 1
+
+	sorted_keys = sorted(ngram_dict, key=ngram_dict.get, reverse=True)
+	top_list = []
+	top_ngramms = 500
+	count = 1
+	for r in sorted_keys:
+		top_list.append(r)
+		if(count == top_ngramms):
+			break
+		count += 1
+
+	## list of top ngrams counting vector for every tweet
+	top_n_gram_vectors = []
+
+	# for every tweet in gram form list
+	for t in ngrams_list:
+		# create a vetor of the counting appearance of the top-k ngrams of the corpus on the tweet
+		top_n_gram_vector =  np.full(top_ngramms,0)
+		for ngram in t:
+			index = -1
+			for top in top_list:
+				index += 1
+				if(top==ngram):
+					top_n_gram_vector[index] += 1
+
+		top_n_gram_vectors.append(top_n_gram_vector)
+
+	return np.array(top_n_gram_vectors)
+
+
+
+
+
+
+
 
