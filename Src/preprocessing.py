@@ -10,7 +10,8 @@ import nltk
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import CountVectorizer
-
+from gensim.models import Word2Vec
+from gensim.test.utils import get_tmpfile
 
 # create a list of dictionaries, containing one dictionary for each available lexicon
 def convert_lex_to_dict():
@@ -172,3 +173,31 @@ def one_hot_encode(labels):
 		else:
 			res.append(1)
 	return res
+
+## use of gensim word2vec embedding technique
+def word2vec_model(tweets):
+	print 'Creating word2vec model..'
+	model_w2v = Word2Vec(tweets, size=100, window=5, min_count=1, workers=4)
+	model_w2v.train(tweets, total_examples= len(tweets), epochs=2)
+	return model_w2v
+
+def embedding_vectorization(tweets,model):
+
+	print model
+
+	vectorized_tweets = []
+
+	for t in tweets:
+		tweet_embedding =  np.full(200,0)
+		for word in t:
+			for i in range (0,len(model.wv[word])):
+				tweet_embedding[i] += model.wv[word][i]
+		for i in range(0,len(model.wv[word])):
+			
+			if np.isnan((float(len(t)))==False):
+				tweet_embedding[i] = tweet_embedding[i]/float(len(t))
+
+		vectorized_tweets.append(tweet_embedding)
+
+	return vectorized_tweets
+
