@@ -10,7 +10,7 @@ Tokenization,Stemming,Lemmatization,Punctuation and Stopwords Removal,Bag of wor
 Use of SVD(Singular Value Decomposition) for dimensinality reduction, Improving the balance of the Dataset using OverSampling,SubSampling,TomekLinks and SMOTE.
 
 --Models: 
-KNN(K-Nearest Neighbors),SVM (Supporting Vector Machines),MLP (Multilayer Perceptron)
+KNN(K-Nearest Neighbors),SVM (Supporting Vector Machines),MLP (Multilayer Perceptron),RoundRobinPairwiseClassification
 
 --Evaluation and Metrics: 
 10-fold Cross Validation,F1-Score
