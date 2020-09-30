@@ -1,4 +1,4 @@
-# Tweet-Classification-Nlp-
+# Tweet-Classification-Nlp
 Classification of tweets using sentiment analysis and nlp techniques
 
 Classifying Tweets in Positive,Neutral,Negative in  a Comparative Analysis of Techniques
